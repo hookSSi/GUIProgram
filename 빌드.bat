@@ -1,0 +1,2 @@
+pyinstaller setup.spec
+PAUSE

@@ -348,3 +348,13 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# not important
+팀장님폴더/
+dist/
+build/
+
+*.xlsx
+*.xls
+*.html
+./엑셀 파일 다운로드 주소.md
