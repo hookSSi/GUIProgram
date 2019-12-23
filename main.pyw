@@ -235,7 +235,7 @@ class Frame(QWidget):
     """
     def Processing_direct_team(self):
         output_df = pd.read_excel(self.xl_file, '직영팀')
-        classify_name_list = output_df.iloc[1,1:].dropna()[:11]
+        classify_name_list = output_df.iloc[1,1:].dropna()[:15]
         classify_name_list = classify_name_list.replace("\s", "", regex = True)
 
         day_list = output_df.iloc[:,0].dropna()
@@ -258,7 +258,8 @@ class Frame(QWidget):
             if(not extracted_df.empty):
                 extracted_df_dict[name] = extracted_df
                 df.loc[df[3].str.contains("본사/%s" % name, regex = False) | df[3].str.contains("본사_%s" % name, regex = False), 4] = "True"
-        extracted_df_dict["기타"] = df[(df[3].str.contains("본사/", regex = False) | df[3].str.contains("본사_", regex = False)) & ~df[4].isin(["True"])]
+            else:
+                extracted_df_dict["기타"] = df[(df[3].str.contains("본사/", regex = False) | df[3].str.contains("본사_", regex = False)) & ~df[4].isin(["True"])]
 
         기타 = extracted_df_dict["기타"]
         if "메인블로그1" in extracted_df_dict.keys():
@@ -416,11 +417,11 @@ class Frame(QWidget):
 
         extracted_df_dict = dict()
         for call_name in call_name_df:
-            extracted_df = df[df[3].str.contains('마케터/' + call_name)]
+            extracted_df = df[df[3].str.contains('마케터/' + call_name) | df[3].str.contains('외부/' + call_name)]
             if(not extracted_df.empty):
                 extracted_df_dict[call_name] = extracted_df
-                df.loc[df[3].str.contains('마케터/' + call_name), 4] = "True"
-        extracted_df_dict["기타"] = df[df[3].str.contains("마케터/") & ~df[4].isin(["True"])]
+                df.loc[df[3].str.contains('마케터/' + call_name) | df[3].str.contains('외부/' + call_name), 4] = "True"
+        extracted_df_dict["기타"] = df[(df[3].str.contains('마케터/' + call_name) | df[3].str.contains('외부/' + call_name)) & ~df[4].isin(["True"])]
 
         util.DicDebug(extracted_df_dict)
         self._logtext += str(extracted_df_dict)
