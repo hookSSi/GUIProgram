@@ -353,7 +353,10 @@ MigrationBackup/
 ÆÀÀå´ÔÆú´õ/
 dist/
 build/
+Scripts/
+Lib/
 
+*.spec
 *.xlsx
 *.xls
 *.html

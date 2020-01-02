@@ -3,7 +3,7 @@
 block_cipher = None
 
 a = Analysis(['main.pyw'],
-             pathex=[r'C:\Users\HookSSi\AppData\Local\Programs\Python\Python37-32\Lib\site-packages\PyQt5\Qt\bin'],
+             pathex=[r'C:\Users\LG R570\Desktop\GUIProgram\Lib\site-packages\PyQt5\Qt\bin'],
              binaries=[],
              datas=[],
              hiddenimports=["PyQt5.sip"],

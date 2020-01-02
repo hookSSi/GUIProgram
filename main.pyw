@@ -71,6 +71,15 @@ class Frame(QWidget):
     # 날짜 자동 보정
     def AdjustDate(self):
         self.date_end.setMinimumDate(self.date_start.date())
+    def ChooseYear(self):
+        year = datetime.now().year
+
+        items = (str(year - 1), str(year))
+        item, okPressed = QInputDialog.getItem(self, "CPA를 계산할 년도를 선택하세요", "", items, 0, False)
+        if okPressed and item:
+            print(item)
+            year = int(item)
+        return year
     # 달 선택
     def ChooseMonth(self):
         month = 0
@@ -131,9 +140,9 @@ class Frame(QWidget):
             print(e.args)
     # 선택한 달에 따른 데이터 다운로드
     # 파일 이름 반환
-    def DownloadData_by_month(self, month, id, name, path):
+    def DownloadData_by_month(self, year, month, id, name, path):
         address = "http://academy.myvilpt.gethompy.com/manager/reception/order_team_xls.php?left_step=&total_day=&Page=1&" \
-                + "id={p_id}&name={p_name}&year={p_year}&month={p_month}".format(p_id = id, p_name = name, p_year = datetime.now().year, p_month = month)
+                + "id={p_id}&name={p_name}&year={p_year}&month={p_month}".format(p_id = id, p_name = name, p_year = year, p_month = month)
         self.file_name = name
         try:
             print(util.download(address, self.file_name + '.html', path, True))
@@ -151,7 +160,7 @@ class Frame(QWidget):
     """
     def Processing_place_order(self):
         output_df = pd.read_excel(self.xl_file, '플레이스')
-        classify_name_list = output_df.iloc[1,1:].dropna()[:11]
+        classify_name_list = output_df.iloc[1,1:].dropna()[:-2]
         classify_name_list = classify_name_list.replace("\s", "", regex = True)
 
         day_list = output_df.iloc[3:35,0].dropna()
@@ -235,7 +244,7 @@ class Frame(QWidget):
     """
     def Processing_direct_team(self):
         output_df = pd.read_excel(self.xl_file, '직영팀')
-        classify_name_list = output_df.iloc[1,1:].dropna()[:15]
+        classify_name_list = output_df.iloc[1,1:].dropna()[:-2]
         classify_name_list = classify_name_list.replace("\s", "", regex = True)
 
         day_list = output_df.iloc[:,0].dropna()
@@ -250,6 +259,7 @@ class Frame(QWidget):
         df = df[df[4] != '(,)']
         df = df.replace("\s", "", regex = True)
 
+        print(classify_name_list)
         # 구분 이름에 따라 DF 분류
         # 구분 이름에 해당하지 않는 것은 "기타" DF로 분류
         extracted_df_dict = dict()
@@ -258,8 +268,7 @@ class Frame(QWidget):
             if(not extracted_df.empty):
                 extracted_df_dict[name] = extracted_df
                 df.loc[df[3].str.contains("본사/%s" % name, regex = False) | df[3].str.contains("본사_%s" % name, regex = False), 4] = "True"
-            else:
-                extracted_df_dict["기타"] = df[(df[3].str.contains("본사/", regex = False) | df[3].str.contains("본사_", regex = False)) & ~df[4].isin(["True"])]
+        extracted_df_dict["기타"] = df[(df[3].str.contains("본사/", regex = False) | df[3].str.contains("본사_", regex = False)) & ~df[4].isin(["True"])]
 
         기타 = extracted_df_dict["기타"]
         if "메인블로그1" in extracted_df_dict.keys():
@@ -325,7 +334,7 @@ class Frame(QWidget):
     """
     def Processing_month_order(self):
         output_df  = pd.read_excel(self.xl_file, '월보장')
-        classify_name_list = output_df.iloc[1,1:].dropna()[:10]
+        classify_name_list = output_df.iloc[1,1:].dropna()[:-1]
         classify_name_list = classify_name_list.replace("\s", "", regex = True)
 
         day_list = output_df.iloc[3:35,0].dropna()
@@ -340,6 +349,7 @@ class Frame(QWidget):
         df = df[df[4] != '(,)']
         df = df.replace("\s", "", regex = True)
 
+        print(classify_name_list)
         # 구분 이름에 따라 DF 분류
         # 구분 이름에 해당하지 않는 것은 "기타" DF로 분류
         extracted_df_dict = dict()
@@ -664,6 +674,7 @@ class Frame(QWidget):
         os.system('start excel.exe "%s"' % (self.xl_file ))
     def WriteLeaderInfo(self):
         user_list = self.GetUserList()
+        year = self.ChooseYear()
         month = self.ChooseMonth()
         self.openFile()
 
@@ -672,7 +683,7 @@ class Frame(QWidget):
 
         for userInfo in user_list:
             # 파일 다운로드
-            f_path = dir_path + '/' +  self.DownloadData_by_month(month, userInfo['아이디'], userInfo['이름'], dir_path)
+            f_path = dir_path + '/' +  self.DownloadData_by_month(year, month, userInfo['아이디'], userInfo['이름'], dir_path)
 
             # pandas로 html을 읽어서 데이터를 옮겨줘야함
             # html을 읽어서 xlsx로 변환하는 방법을 생각해봤으나
@@ -681,7 +692,7 @@ class Frame(QWidget):
             try:              
                 output_ws = output_wb[userInfo['이름']]
                 # B5 ~ Q35
-                monthrange = calendar.monthrange(datetime.now().year, month)
+                monthrange = calendar.monthrange(year, month)
                 output_ws = xl.ClearWorkbook(output_ws, ['B', 'Q'], [5, 36])
                 output_ws = xl.HtmlValueToWorkbook(f_path, output_ws, ['B', 'Q'], [5, monthrange[1] + 5])
             except Exception as e:

@@ -1,6 +1,6 @@
 @echo off
 
-set "VIRTUAL_ENV=C:\Users\HookSSi\Desktop\일\GUIProgram"
+set "VIRTUAL_ENV=C:\Users\LGR570~1\Desktop\GUIPRO~1"
 
 if defined _OLD_VIRTUAL_PROMPT (
     set "PROMPT=%_OLD_VIRTUAL_PROMPT%"
@@ -13,7 +13,7 @@ if defined _OLD_VIRTUAL_PROMPT (
     )
 )
 if not defined VIRTUAL_ENV_DISABLE_PROMPT (
-    set "PROMPT=(GUIProgram) %PROMPT%"
+    set "PROMPT=(GUIPRO~1) %PROMPT%"
 )
 
 REM Don't use () to avoid problems with them in %PATH%
