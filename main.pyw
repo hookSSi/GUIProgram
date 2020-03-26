@@ -354,11 +354,11 @@ class Frame(QWidget):
         # 구분 이름에 해당하지 않는 것은 "기타" DF로 분류
         extracted_df_dict = dict()
         for name in classify_name_list:
-            extracted_df = df[df[3].str.contains("월보장_%s" % name, regex = False) | df[3].str.contains("월보장/%s" % name, regex = False) | df[3].str.contains("지식인/%s" % name, regex = False)]
+            extracted_df = df[df[3].str.contains("월보장_%s" % name, regex = False) | df[3].str.contains("월보장/%s" % name, regex = False) | df[3].str.contains("지식인/%s" % name, regex = False) | df[3].str.contains("지식인_%s" % name, regex = False)]
             if(not extracted_df.empty):
                 extracted_df_dict[name] = extracted_df
-                df.loc[df[3].str.contains("월보장_%s" % name) | df[3].str.contains("월보장/%s" % name) | df[3].str.contains("지식인/%s"), 4] = "True"
-        extracted_df_dict["기타"] = df[(df[3].str.contains("월보장_%s" % name) | df[3].str.contains("월보장/%s" % name) | df[3].str.contains("지식인/%s")) & ~df[4].isin(["True"])]
+                df.loc[df[3].str.contains("월보장_%s" % name) | df[3].str.contains("월보장/%s" % name) | df[3].str.contains("지식인/%s") | df[3].str.contains("지식인_%s" % name, regex = False), 4] = "True"
+        extracted_df_dict["기타"] = df[(df[3].str.contains("월보장_%s" % name) | df[3].str.contains("월보장/%s" % name) | df[3].str.contains("지식인/%s") | df[3].str.contains("지식인_%s" % name, regex = False)) & ~df[4].isin(["True"])]
 
         util.DicDebug(extracted_df_dict)
         self._logtext += str(extracted_df_dict)
